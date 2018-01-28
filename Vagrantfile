@@ -12,8 +12,35 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "centos/7"
-  config.vm.network "private_network", type: "dhcp"
+  config.vm.provider "virtualbox" do |v|
+      v.gui = true
+      v.memory = 1024
+      v.cpus = 2
+  end
+  config.vm.define "centos" do |centos|
+    centos.vm.box = "centos/7"
+    centos.ssh.username = "vagrant"
+    centos.ssh.password = "vagrant"
+    centos.vm.network "public_network", use_dhcp_assigned_default_route: true
+  end
+  config.vm.define "windows" do |windows|
+    windows.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
+    windows.vm.guest = :windows
+    windows.vm.communicator = "winrm"
+    windows.winrm.username = "vagrant"
+    windows.winrm.password = "vagrant"
+    windows.network "private_network", type: "dhcp"
+  end
+
+  config.push.define "ftp" do |push|
+    push.host = "ftp.company.com"
+    push.username = "username"
+    push.password = "password"
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yml"
+  end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs

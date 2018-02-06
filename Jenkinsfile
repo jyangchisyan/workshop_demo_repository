@@ -1,12 +1,18 @@
-def callFunction(){
-    echo 'call function'
-}
-
 pipeline {
     agent any
     stages {
-        stage('Call function Example') {
-            callFunction()
+        stage('Post Example') {
+            steps{
+                echo 'In stages'
+            }
+        }
+    }
+    post{
+        always{
+            echo 'after stage always execute it'
+        }
+        success{
+            echo 'if job excute success, excute it'
         }
     }
 }
